@@ -395,7 +395,6 @@
   (yas-expand))
 
 (defun ceh--f-expand ()
-  (interactive)
   (cond ((not (ceh--f-sexp))
 	 (ceh--f-peekrs " )")
 	 (ceh--f-peekrs " ]"))
@@ -487,7 +486,6 @@
 ;    (ceh-decl-to-impl-namespace namespace)))
 
 ;;//- mode definition -
-;; specify mode
 (define-minor-mode ceh-mode
   "C Edit Helper - mode for enhancing C - like languages editing"
   :lighter " CEH"
@@ -495,7 +493,7 @@
 	    (define-key map (kbd "<M-return>") 'ceh-new-brace)
 	    (define-key map (kbd "<S-return>") 'ceh-finish-expression)
 	    (define-key map (kbd "C-(") 'ceh-parametrize)
-	    (define-key map (kbd "C-)") 'ceh-unparametrize) ;; TODO: check this keybind
+	    (define-key map (kbd "C-)") 'ceh-unparametrize)
 	    (define-key map (kbd "C-\"") 'ceh-stringize-line)
 	    (define-key map (kbd "M-,") 'ceh-step-in-args)
 	    (define-key map (kbd "M-.") 'ceh-step-out-of-args)
