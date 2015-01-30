@@ -56,13 +56,16 @@
     nil))
 
 (defun ceh--f-sexp ()
+  "forward-sexp returning t/nil state"
   (ignore-errors (forward-sexp) t))
 (defun ceh--b-sexp ()
+  "forward-sexp returning t/nil state"
   (ignore-errors (backward-sexp) t))
 
 ;; TODO: templates?
 ;; TODO: array indexing []
 (defun ceh--f-atom ()
+  "moves cursor at the end of sexp"
   (cond ((ceh--inside-string)
 	 (ceh--f-step-out-of-string))
 	((ceh--f-sexp)
@@ -77,6 +80,7 @@
 	(t nil)))
 
 (defun ceh--b-atom ()
+  "moves cursor to beginning of sexp"
   (cond ((ceh--inside-string)
 	 (ceh--b-step-out-of-string))
 	((ceh--b-sexp)
@@ -101,14 +105,17 @@
   (ceh--b-peek "("))
 
 (defun ceh--inside-args ()
+  "checks if point is inside arguments () or []"
   (save-excursion (ceh--f-args)))
 
 (defun ceh--step-out-of-args ()
+  "moves point outside of arguments (_) -> ()_"
   (when (save-excursion (ceh--f-args))
     (ceh--f-args)
     (forward-char)))
 
 (defun ceh--b-step-out-of-args ()
+  "places point before arguments (_) -> _()"
   (when (save-excursion (ceh--b-args))
     (ceh--b-args)
     (forward-char -1)))
@@ -122,23 +129,6 @@
   (while (progn (ceh--b-search rex)
 		(or (ceh--inside-string)
 		    (ceh--inside-args)))))
-
-(defun ceh--flat-expression ()
-  (save-excursion
-    (ceh--b-step-out-of-args)
-    (while (and
-	    (ceh--b-sexp)
-	    (save-excursion
-	      (ceh--b-sexp)
-	      (ceh--f-sexp)
-	      (not (and (ceh--f-peekr " ( ")
-			(or (ceh--b-peekr " if ")
-			    (ceh--b-peekr " for ")
-			    (ceh--b-peekr " while ")))))))
-    (and (ceh--f-peek "(")
-	 (or (ceh--b-peekr " if ")
-	     (ceh--b-peekr " for ")
-	     (ceh--b-peekr " while ")))))
 
 (defun ceh--f-block ()
   (ceh--step-out-of-args)
@@ -507,7 +497,6 @@
   ;; chords
   (when (require 'key-chord nil 'noerror)
     (key-chord-define-global "qq" 'ceh-kill-line)
-    ;;(key-chord-define-global ",," 'ceh--chord-skip-chars)
     (key-chord-define-global "[[" 'ceh-include-block)
     (key-chord-define-global "]]" 'ceh-exclude-block)
     (key-chord-define-global "[]" 'ceh-create-block)
