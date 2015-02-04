@@ -5,6 +5,8 @@
 ;; TODO: intelligent killing
 ;; TODO: killing brackets
 
+(defvar ceh-brace-newline nil)
+
 ;;//- general functiions / detail -
 (defconst ceh--operators "- */\+|&^%!,<>=\n\t")
 
