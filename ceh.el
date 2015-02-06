@@ -5,7 +5,7 @@
 ;; TODO: intelligent killing
 ;; TODO: killing brackets
 
-(defvar ceh-brace-newline nil)
+(defvar ceh-brace-newline t)
 
 ;;//- general functiions / detail -
 (defconst ceh--operators "- */\+|&^%!,<>=\n\t")
@@ -224,7 +224,10 @@
 (defun ceh-new-brace ()
   (interactive)
   (end-of-line)
-  (insert " {")
+  (if ceh-brace-newline
+      (insert " {")
+    (newline)
+    (insert "{"))
   (newline)
   (newline)
   (insert "}")
@@ -374,7 +377,10 @@
 		   (ceh--f-search-ignoring-args-string ";")
 		   (point))))
     (goto-char pt-begin)
-    (insert " {")
+    (if ceh-brace-newline
+	(insert " {")
+      (newline)
+      (insert "{"))
     (goto-char (+ 2 pt-end))
     (newline)
     (insert "}")
