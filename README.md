@@ -15,6 +15,10 @@ You must have key-chord.el and yasnippet.el installed, then just add to init.el:
   "runs [function] for given [hooks]"
   (mapc (lambda (hook) (add-hook hook function)) hooks))
 
+;; set inserting '{' behaviour, when ceh-brace-newline is nil open brace char
+;; is inserted after newline
+(setq ceh-brace-newline t)
+
 ;; add hooks
 (add-hooks 'ceh-mode
 	   '(cg-mode-hook
