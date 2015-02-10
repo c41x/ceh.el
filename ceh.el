@@ -28,7 +28,8 @@
       t nil))
 
 (defun ceh--f-step-out-of-string ()
-  (ceh--f-search "[^\\]\""))
+  (ceh--f-search "[^\\]\"")
+  (ceh--f-peekrs "\""))
 (defun ceh--b-step-out-of-string ()
   (ceh--b-search "[^\\]\"")
   (forward-char))
@@ -393,11 +394,13 @@
   (yas-expand))
 
 (defun ceh--f-expand ()
-  (cond ((not (ceh--f-sexp))
+  (interactive)
+  (cond ((ceh--inside-string)
+	 (message "INSIDE STRING")
+	 (ceh--f-step-out-of-string))
+	((not (ceh--f-sexp))
 	 (ceh--f-peekrs " )")
 	 (ceh--f-peekrs " ]"))
-	((ceh--inside-string)
-	 (ceh--f-step-out-of-string))
 	(t
 	 (ceh--f-peekrs " \""))))
 
