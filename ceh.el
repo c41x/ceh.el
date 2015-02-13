@@ -160,6 +160,13 @@
 (defun ceh--eol ()
   (= (point) (line-end-position)))
 
+(defun ceh--is-semicolon-delimited-expr ()
+  (save-excursion
+    (beginning-of-line-text)
+    (or (ceh--f-peekr " struct ")
+	(ceh--f-peekr " enum ")
+	(ceh--f-peekr " class "))))
+
 ;;//- user space API (interactives) -
 (defun ceh-parametrize ()
   (interactive)
@@ -224,17 +231,20 @@
 
 (defun ceh-new-brace ()
   (interactive)
-  (end-of-line)
-  (if ceh-brace-newline
-      (insert " {")
+  (let ((put-semicolon (ceh--is-semicolon-delimited-expr)))
+    (end-of-line)
+    (if ceh-brace-newline
+	(insert " {")
+      (newline)
+      (insert "{"))
     (newline)
-    (insert "{"))
-  (newline)
-  (newline)
-  (insert "}")
-  (indent-for-tab-command)
-  (forward-line -1)
-  (indent-for-tab-command))
+    (newline)
+    (insert "}")
+    (when put-semicolon
+      (insert ";"))
+    (indent-for-tab-command)
+    (forward-line -1)
+    (indent-for-tab-command)))
 
 (defun ceh-transpose-atoms ()
   (interactive)
@@ -373,7 +383,8 @@
     (end-of-line)
     (when (ceh--b-peek ";")
       (delete-char -1))) ;; EOL, delete semicolon
-  (let* ((pt-begin (point))
+  (let* ((put-semicolon (ceh--is-semicolon-delimited-expr))
+	 (pt-begin (point))
 	 (pt-end (progn
 		   (ceh--f-search-ignoring-args-string ";")
 		   (point))))
@@ -385,6 +396,8 @@
     (goto-char (+ 2 pt-end))
     (newline)
     (insert "}")
+    (when put-semicolon
+      (insert ";"))
     (indent-region pt-begin (point))
     (forward-char -1)
     (skip-chars-backward " \n\t")))
