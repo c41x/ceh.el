@@ -28,6 +28,10 @@
       t nil))
 
 (defun ceh--f-step-out-of-string ()
+  (interactive)
+  (unless (and (ceh--b-peek "\"")
+	       (not (ceh--f-peek "\"")))
+    (backward-char))
   (ceh--f-search "[^\\]\"")
   (ceh--f-peekrs "\""))
 (defun ceh--b-step-out-of-string ()
@@ -409,7 +413,6 @@
 (defun ceh--f-expand ()
   (interactive)
   (cond ((ceh--inside-string)
-	 (message "INSIDE STRING")
 	 (ceh--f-step-out-of-string))
 	((not (ceh--f-sexp))
 	 (ceh--f-peekrs " )")
