@@ -406,6 +406,21 @@
     (forward-char -1)
     (skip-chars-backward " \n\t")))
 
+(defun ceh-member-guess-expand ()
+  (interactive)
+  (let* ((str-begin (save-excursion
+		      (forward-line -1)
+		      (beginning-of-line-text)
+		      (point)))
+	 (str-end (save-excursion
+		    (goto-char str-begin)
+		    (ceh--f-sexp)
+		    (ceh--f-sexp)
+		    (ceh--b-sexp)
+		    (point)))
+	 (str (buffer-substring-no-properties str-begin str-end)))
+    (insert str)))
+
 ;;//- expand macro utility -
 (defun ceh--expand-fallback ()
   (yas-expand))
@@ -420,8 +435,8 @@
 	(t
 	 (ceh--f-peekrs " \""))))
 
-(defun ceh--transform (a b &optional before-insert finally)
-  (if (ceh--b-peek a)
+(defun ceh--transform (a b &optional before-insert finally condition)
+  (if (and (ceh--b-peek a) (if condition (funcall condition) t))
       (progn (delete-char (- 0 (length a)))
 	     (if before-insert (funcall before-insert))
 	     (insert b)
@@ -432,6 +447,7 @@
 (defun ceh-expand ()
   (interactive)
   (cond
+   ((ceh--transform "." "" nil 'ceh-member-guess-expand 'ceh--eol))
    ;; recursives first
    ((ceh--transform " <= " "<=" nil 'ceh-expand))
    ((ceh--transform " >= " ">=" nil 'ceh-expand))
@@ -439,7 +455,7 @@
    ((ceh--transform " || " "||" nil 'ceh-expand))
    ((ceh--transform " && " "&&" nil 'ceh-expand))
    ((ceh--transform ", " "," nil 'ceh-expand))
-   ((ceh--transform "; " ";" nil 'ceh-expand))
+   ((ceh--transform "; " ";" nil 'ceh-expand 'ceh--not-eol))
    ((ceh--transform " + " "+" nil 'ceh-expand))
    ((ceh--transform " - " "-" nil 'ceh-expand))
    ((ceh--transform " > " ">" nil 'ceh-expand))
@@ -448,7 +464,7 @@
    ;; construct
    ((ceh--transform "--" " - " 'ceh--f-expand))
    ((ceh--transform "-" "->" 'ceh--f-expand))
-   ((ceh--transform ";" "; " 'ceh--f-expand))
+   ((ceh--transform ";" "; " 'ceh--f-expand 'ceh--not-eol))
    ((ceh--transform "<=" " <= " 'ceh--f-expand))
    ((ceh--transform ">=" " >= " 'ceh--f-expand))
    ((ceh--transform "==" " == " 'ceh--f-expand))
