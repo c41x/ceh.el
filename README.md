@@ -49,4 +49,5 @@ You must have key-chord.el and yasnippet.el installed, then just add to init.el:
 * ceh-include-block
 * ceh-exclude-block
 * ceh-create-block
+* ceh-member-guess-expand
 * ceh-expand
