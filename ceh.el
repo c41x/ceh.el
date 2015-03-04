@@ -457,7 +457,8 @@
 	   (ceh--f-peekr " # include \""))
 	 (insert "#include \"")
 	 (save-excursion
-	   (insert "\"")))))
+	   (insert "\"")))
+	(t (ceh-member-guess-expand))))
 
 ;;//- expand macro utility -
 (defun ceh--expand-fallback ()
@@ -486,7 +487,6 @@
   (interactive)
   (cond
    ((ceh--transform "." "" nil 'ceh-guess-expand 'ceh--eol))
-   ((ceh--transform "." "" nil 'ceh-member-guess-expand 'ceh--eol))
    ;; recursives first
    ((ceh--transform " <= " "<=" nil 'ceh-expand))
    ((ceh--transform " >= " ">=" nil 'ceh-expand))
