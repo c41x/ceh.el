@@ -421,6 +421,44 @@
 	 (str (buffer-substring-no-properties str-begin str-end)))
     (insert str)))
 
+(defun ceh-guess-expand ()
+  (interactive)
+  ;; if - else chaining
+  (cond ((save-excursion
+	   (forward-line -1)
+	   (end-of-line)
+	   (ceh--b-peekr " } "))
+	 (let ((type 0))
+	   (save-excursion
+	     (forward-line -1)
+	     (end-of-line)
+	     (ceh--b-sexp)
+	     (beginning-of-line-text)
+	     (cond ((or (ceh--f-peekr " else if ")
+			(ceh--f-peekr " if "))
+		    (setq type 1))))
+	   (cond ((= type 1)
+		  (insert "else if (")
+		  (save-excursion
+		    (insert ") {\n}")
+		    (indent-for-tab-command))))))
+	;; include <>
+	((save-excursion
+	   (forward-line -1)
+	   (beginning-of-line)
+	   (ceh--f-peekr " # include <"))
+	 (insert "#include <")
+	 (save-excursion
+	   (insert ">")))
+	;; include ""
+	((save-excursion
+	   (forward-line -1)
+	   (beginning-of-line)
+	   (ceh--f-peekr " # include \""))
+	 (insert "#include \"")
+	 (save-excursion
+	   (insert "\"")))))
+
 ;;//- expand macro utility -
 (defun ceh--expand-fallback ()
   (yas-expand))
@@ -447,6 +485,7 @@
 (defun ceh-expand ()
   (interactive)
   (cond
+   ((ceh--transform "." "" nil 'ceh-guess-expand 'ceh--eol))
    ((ceh--transform "." "" nil 'ceh-member-guess-expand 'ceh--eol))
    ;; recursives first
    ((ceh--transform " <= " "<=" nil 'ceh-expand))
@@ -463,7 +502,7 @@
    ((ceh--transform " * " "*" nil 'ceh-expand))
    ((ceh--transform " / " "/" nil 'ceh-expand))
    ((ceh--transform "->" "-" nil 'ceh-expand))
-      ;; construct
+   ;; construct
    ((ceh--transform "--" " - " 'ceh--f-expand))
    ((ceh--transform "-" "->" 'ceh--f-expand))
    ((ceh--transform ";" "; " 'ceh--f-expand nil 'ceh--not-eol))
