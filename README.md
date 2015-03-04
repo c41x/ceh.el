@@ -51,3 +51,4 @@ You must have key-chord.el and yasnippet.el installed, then just add to init.el:
 * ceh-create-block
 * ceh-member-guess-expand
 * ceh-expand
+* ceh-guess-expand
