@@ -424,6 +424,17 @@
 	(setq i (- i 1))))
     (insert " //")))
 
+(defun ceh-comment-next-atom ()
+  (interactive)
+  (let* ((str-begin (save-excursion (when (ceh--b-atom) (ceh--f-atom)) (point)))
+	 (str-end (save-excursion (ceh--f-atom) (point)))
+	 (str (buffer-substring-no-properties str-begin str-end)))
+    (save-excursion
+      (delete-region str-begin str-end)
+      (end-of-line)
+      (insert " // ")
+      (insert str))))
+
 (defun ceh-member-guess-expand ()
   (interactive)
   (let* ((str-begin (save-excursion
@@ -506,6 +517,7 @@
   (cond
    ((ceh--transform "." "" nil 'ceh-guess-expand 'ceh--eol))
    ((ceh--transform "/e" "" nil 'ceh-comment-to-eol))
+   ((ceh--transform "/a" "" nil 'ceh-comment-next-atom))
    ;; recursives first
    ((ceh--transform " <= " "<=" nil 'ceh-expand))
    ((ceh--transform " >= " ">=" nil 'ceh-expand))
