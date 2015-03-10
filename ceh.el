@@ -406,6 +406,24 @@
     (forward-char -1)
     (skip-chars-backward " \n\t")))
 
+(defun ceh-comment-to-eol ()
+  (interactive)
+  (if (ceh--f-peekrs " ) ")
+      (progn (ceh--step-out-of-args)
+	     (save-excursion (insert " //")))
+    (let ((p (save-excursion (beginning-of-line) (point)))
+	  (i 0))
+      (while (< p (point))
+	(cond ((= ?\( (char-after p))
+	       (setq i (+ 1 i)))
+	      ((= ?\) (char-after p))
+	       (setq i (- i 1))))
+	(setq p (+ 1 p)))
+      (while (> i 0)
+	(insert ")")
+	(setq i (- i 1))))
+    (insert " //")))
+
 (defun ceh-member-guess-expand ()
   (interactive)
   (let* ((str-begin (save-excursion
@@ -487,6 +505,7 @@
   (interactive)
   (cond
    ((ceh--transform "." "" nil 'ceh-guess-expand 'ceh--eol))
+   ((ceh--transform "/e" "" nil 'ceh-comment-to-eol))
    ;; recursives first
    ((ceh--transform " <= " "<=" nil 'ceh-expand))
    ((ceh--transform " >= " ">=" nil 'ceh-expand))
