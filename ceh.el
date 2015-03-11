@@ -426,7 +426,7 @@
 
 (defun ceh-comment-next-atom ()
   (interactive)
-  (let* ((str-begin (save-excursion (when (ceh--b-atom) (ceh--f-atom)) (point)))
+  (let* ((str-begin (point))
 	 (str-end (save-excursion (ceh--f-atom) (point)))
 	 (str (buffer-substring-no-properties str-begin str-end)))
     (save-excursion
