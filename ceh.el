@@ -487,7 +487,25 @@
 	 (insert "#include \"")
 	 (save-excursion
 	   (insert "\"")))
-	(t (ceh-member-guess-expand))))
+	((= (point) (save-excursion (beginning-of-line-text) (point)))
+	 (ceh-member-guess-expand))
+	(t (let* ((chars-to-skip
+		  (- (point)
+		     (save-excursion (beginning-of-line)
+				     (point))))
+		  (str-begin
+		   (save-excursion
+		     (forward-line -1)
+		     (beginning-of-line)
+		     (forward-char chars-to-skip)
+		     (point)))
+		  (str-end
+		   (save-excursion
+		     (goto-char str-begin)
+		     (ceh--f-sexp)
+		     (point)))
+		  (str (buffer-substring-no-properties str-begin str-end)))
+	     (insert str)))))
 
 ;;//- expand macro utility -
 (defun ceh--expand-fallback ()
@@ -515,7 +533,7 @@
 (defun ceh-expand ()
   (interactive)
   (cond
-   ((ceh--transform "." "" nil 'ceh-guess-expand 'ceh--eol))
+   ((ceh--transform "\\" "" nil 'ceh-guess-expand))
    ((ceh--transform "/e" "" nil 'ceh-comment-to-eol))
    ((ceh--transform "/a" "" nil 'ceh-comment-next-atom))
    ;; recursives first
