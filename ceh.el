@@ -566,6 +566,8 @@
    ((ceh--transform "/" " / " 'ceh--f-expand))
    ((ceh--transform "&" " && " 'ceh--f-expand))
    ((ceh--transform "|" " || " 'ceh--f-expand))
+   ((ceh--transform "<<" " << " 'ceh--f-expand))
+   ((ceh--transform ">>" " >> " 'ceh--f-expand))
    ((ceh--transform ">" " > " 'ceh--f-expand))
    ((ceh--transform "<" " < " 'ceh--f-expand))
    ;; fallback
