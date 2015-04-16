@@ -575,6 +575,33 @@
    ;; fallback
    (t (ceh--expand-fallback))))
 
+;;//- modal edit prototypes -
+(defmacro ceh--rk (desc &rest keylists)
+  `(pcase (key-description (vector (read-key ,desc)))
+     .,keylists))
+
+(defmacro ceh--rkl (desc delim &rest keylists)
+  `(while (not (string= ,delim
+			(let ((rkey (key-description (vector (read-key ,desc)))))
+			  (pcase rkey .,keylists)
+			  rkey)))))
+
+(defun ceh-do-it ()
+  (interactive)
+  (ceh--rk "<Do It>"
+	   ("f" (ido-find-file))
+	   ("b" (ido-switch-buffer))
+	   ("j" (smex))
+	   ("z" (undo))
+	   ("s" (save-buffer))
+	   ("o" (set-window-buffer (selected-window) (previous-buffer)))
+	   ("m" (ceh--rkl "<J - up, M - down>" "g"
+			  ("k" (smooth-scroll -1 8 0.1))
+			  ("m" (smooth-scroll 1 8 0.1))))
+	   ("c" (ceh--rk "<Comment>"
+			 ("e" (ceh-comment-to-eol))
+			 ("a" (ceh-comment-next-atom))))))
+
 ;; (defun ceh-command ()
 ;;   (interactive)
 ;;   (pcase (popup-menu* (mapcar (lambda (e) (popup-make-item (car e) :value (cdr e)))
