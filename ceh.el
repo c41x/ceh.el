@@ -575,49 +575,6 @@
    ;; fallback
    (t (ceh--expand-fallback))))
 
-;;//- modal edit prototypes -
-(defmacro ceh--rk (desc &rest keylists)
-  `(pcase (key-description (vector (read-key ,desc)))
-     .,keylists))
-
-(defmacro ceh--rkl (desc delim &rest keylists)
-  `(while (not (string= ,delim
-			(let ((rkey (key-description (vector (read-key ,desc)))))
-			  (pcase rkey .,keylists)
-			  rkey)))))
-
-(defun ceh-do-it ()
-  (interactive)
-  (setq-default cursor-type 'box)
-  (set-cursor-color "orange")
-  (blink-cursor-mode 0)
-  (ceh--rk "<Do It>"
-	   ("f" (ido-find-file))
-	   ("g" (ido-switch-buffer))
-	   ("j" (smex))
-	   ("z" (undo))
-	   ("s" (save-buffer))
-	   ("x" (page-breaks-popup))
-	   ("o" (switch-to-buffer (other-buffer (current-buffer) 1)))
-	   ("m" (ceh--rkl "<K - up, M - down, J - quit>" "j"
-			  ("k" (smooth-scroll -1 8 0.1))
-			  ("m" (smooth-scroll 1 8 0.1))))
-	   ("c" (ceh--rk "<Comment>"
-			 ("e" (ceh-comment-to-eol))
-			 ("a" (ceh-comment-next-atom))))
-	   ("v" (ceh--rk "<Version Control>"
-			 ("d" (call-interactively 'vc-dir))
-			 ("=" (vc-diff))
-			 ("c" (vc-diff))
-			 ("v" (call-interactively 'vc-next-action))
-			 ("u" (call-interactively 'vc-revert))))
-	   ("k" (ceh--rk "<Kill>"
-			 ("k" (kill-buffer))
-			 ("w" (kill-buffer-and-window)))))
-  (setq-default cursor-type 'hbar)
-  (set-cursor-color "white")
-  (blink-cursor-mode 1))
-
 ;; (defun ceh-command ()
 ;;   (interactive)
 ;;   (pcase (popup-menu* (mapcar (lambda (e) (popup-make-item (car e) :value (cdr e)))
