@@ -506,8 +506,16 @@
 		     (goto-char str-begin)
 		     (ceh--f-sexp)
 		     (point)))
+		  (hanging-brace
+		   (save-excursion
+		     (goto-char str-end)
+		     (ceh--f-peek "(")))
 		  (str (buffer-substring-no-properties str-begin str-end)))
-	     (insert str)))))
+	     (insert str)
+	     ;; reinsert braces
+	     (when hanging-brace
+	       (insert "();")
+	       (backward-char 2))))))
 
 ;;//- expand macro utility -
 (defun ceh--expand-fallback ()
