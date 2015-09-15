@@ -240,7 +240,10 @@
     (when (ceh--b-peek ";")
       (delete-char -1))
     (if ceh-brace-newline
-	(insert " {")
+	(progn
+	  (unless (ceh--b-peek " ")
+	    (insert " "))
+	  (insert "{"))
       (newline)
       (insert "{"))
     (newline)
