@@ -226,7 +226,13 @@
 (defun ceh-finish-expression ()
   (interactive)
   (end-of-line)
-  (if (not (ceh--in-array (char-before) ";:}{+-|&<\\//.,!*="))
+  (if (not (or (ceh--in-array (char-before) ";:}{+-|&<\\//.,!*=")
+	       (save-excursion
+		 (beginning-of-line)
+		 (or (ceh--f-peekr " if ")
+		     (ceh--f-peekr " else ")
+		     (ceh--f-peekr " while ")
+		     (ceh--f-peekr " for ")))))
       (progn
 	(insert ";")
 	(indent-for-tab-command))
