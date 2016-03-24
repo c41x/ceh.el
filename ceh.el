@@ -237,23 +237,26 @@
   (interactive)
   (let ((put-semicolon (ceh--is-semicolon-delimited-expr)))
     (end-of-line)
-    (when (ceh--b-peek ";")
-      (delete-char -1))
-    (if ceh-brace-newline
-	(progn
-	  (unless (ceh--b-peek " ")
-	    (insert " "))
-	  (insert "{"))
+    (if (ceh--b-peek "{")
+	(progn (forward-line (if ceh-brace-newline 1 2))
+	       (indent-for-tab-command))
+      (when (ceh--b-peek ";")
+	(delete-char -1))
+      (if ceh-brace-newline
+	  (progn
+	    (unless (ceh--b-peek " ")
+	      (insert " "))
+	    (insert "{"))
+	(newline)
+	(insert "{"))
       (newline)
-      (insert "{"))
-    (newline)
-    (newline)
-    (insert "}")
-    (when put-semicolon
-      (insert ";"))
-    (indent-for-tab-command)
-    (forward-line -1)
-    (indent-for-tab-command)))
+      (newline)
+      (insert "}")
+      (when put-semicolon
+	(insert ";"))
+      (indent-for-tab-command)
+      (forward-line -1)
+      (indent-for-tab-command))))
 
 (defun ceh-transpose-atoms ()
   (interactive)
