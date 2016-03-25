@@ -526,7 +526,9 @@
 	     (insert str)
 	     ;; reinsert braces
 	     (when hanging-brace
-	       (insert "();")
+	       (insert "()")
+	       (when (eq (point) (save-excursion (end-of-line) (point)))
+		 (insert ";"))
 	       (backward-char 2))))))
 
 ;;//- expand macro utility -
