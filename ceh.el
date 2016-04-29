@@ -531,6 +531,55 @@
 		 (insert ";"))
 	       (backward-char 2))))))
 
+;;//- up-down line navigation (prototype)
+;; TODO: subtoken
+;; TODO: backward match
+;; TODO: similarities match
+
+(defun chars-from-beginning-of-line ()
+    (- (point) (line-beginning-position)))
+
+(defun chars-to-end-of-line ()
+    (- (line-end-position) (point)))
+
+(defun chars-in-line ()
+    (- (line-end-position) (line-beginning-position)))
+
+(defun next-token? ()
+  (interactive)
+  (cond ((looking-at "[ \t\r]+")
+	 (goto-char (match-end 0))
+	 t)
+	((looking-at "[A-Za-z0-9]+")
+	 (goto-char (match-end 0))
+	 t)
+	((looking-at "\\\"[^\"]*\\\"")
+	 (goto-char (match-end 0))
+	 t)
+	((looking-at "[^\n]")
+	 (forward-char)
+	 t)
+	(t nil)))
+
+(defun count-tokens ()
+  (interactive)
+  (save-excursion
+    (let ((p (point))
+	  (count 0))
+      (goto-char (line-beginning-position))
+      (while (and (< (point) p) (next-token?))
+	(setq count (+ count 1)))
+      count)))
+
+(defun aided-forward-line ()
+  (interactive)
+  (let ((chars (chars-from-beginning-of-line))
+	(tokens-to-skip (count-tokens)))
+    (forward-line 1)
+    (while (> tokens-to-skip 0)
+      (setq tokens-to-skip (- tokens-to-skip 1))
+      (next-token?))))
+
 ;;//- expand macro utility -
 (defun ceh--expand-fallback ()
   (yas-expand))
