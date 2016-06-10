@@ -69,6 +69,12 @@
   "forward-sexp returning t/nil state"
   (ignore-errors (backward-sexp) t))
 
+(defun ceh--b-get-sexp ()
+  (save-excursion
+    (let* ((begin (progn (ceh--b-sexp) (point)))
+	   (end (progn (ceh--f-sexp) (point))))
+      (buffer-substring-no-properties begin end))))
+
 ;; TODO: templates?
 ;; TODO: array indexing []
 (defun ceh--f-atom ()
@@ -170,6 +176,30 @@
     (or (ceh--f-peekr " struct ")
 	(ceh--f-peekr " enum ")
 	(ceh--f-peekr " class "))))
+
+;;//- name selection
+(defvar name-selection-buffer nil)
+
+(defun name-selection ()
+  (interactive)
+  (setq name-selection-buffer (buffer-substring-no-properties
+			       (region-beginning)
+			       (region-end)))
+  (delete-region (region-beginning)
+		 (region-end))
+  (push-mark)
+  (add-hook 'post-self-insert-hook 'name-selection-perform-replace-hook))
+
+(defun name-selection-perform-replace-hook ()
+  (when (= (char-before) ?\=)
+    (let ((variable-name (ceh--b-get-sexp)))
+      (insert " ")
+      (insert name-selection-buffer)
+      (goto-char (line-end-position))
+      (insert ";")
+      (goto-char (mark))
+      (insert variable-name)
+      (remove-hook 'post-self-insert-hook 'name-selection-perform-replace-hook))))
 
 ;;//- user space API (interactives) -
 (defun ceh-parametrize ()
